@@ -1,0 +1,39 @@
+<div th:fragment="sidebar" class="app-sidebar col-1" style="padding-left: 40px !important;">
+    <a th:href="@{/user/list}" class="app-sidebar-link">
+          <span class="material-symbols-outlined" style="font-size: 60px;">
+            location_away
+          </span>
+      <p>Home</p>
+    </a>
+
+    <a th:href="@{/}" class="app-sidebar-link">
+          <span class="material-symbols-outlined" style="font-size: 60px;">
+            person
+          </span>
+          <p>Candidate</p>
+    </a>
+
+    <a th:href="@{/jobs/create}" class="app-sidebar-link">
+          <span class="material-symbols-outlined" style="font-size: 60px;">
+            business_center
+          </span>
+      <p>Job</p>
+    </a>
+
+    <a th:href="@{/}" class="app-sidebar-link">
+          <span class="material-symbols-outlined" style="font-size: 60px;">
+            forum
+          </span>
+      <p>Interview</p>
+    </a>
+
+
+    <a th:href="@{/offer}" class="app-sidebar-link">
+          <span class="material-symbols-outlined" style="font-size: 60px;">
+            clinical_notes
+          </span>
+      <p>Offer</p>
+    </a>
+
+
+</div>

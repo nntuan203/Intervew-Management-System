@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+<head>
+  <title>View Interview Schedule Detail</title>
+  <th:block th:insert="fragment/header-insert"></th:block>
+  <style>
+    td:not(:first-child) {
+      padding-top: 5px;
+      padding-bottom: 5px;
+    }
+  </style>
+</head>
+
+
+<body>
+<main class="d-flex">
+  <!--    Sidebar-->
+  <th:block th:insert="fragment/sidebar-ver-2"></th:block>
+
+  <!--    Main content-->
+  <div class="w-100 ms-4">
+    <div class="d-flex justify-content-between">
+      <div>
+        <h1 class="py-3">Interview Schedule</h1>
+      </div>
+      <th:block th:insert="fragment/user-button"></th:block>
+
+
+    </div>
+    <!--            -->
+    <div class="">
+      <div class="d-flex justify-content-between">
+        <nav class="breadcrumb">
+          <a class="breadcrumb-item text-decoration-none" th:href="@{/interview-schedule/view-list}">Interview
+            Schedule List</a>
+          <span class="breadcrumb-item active" aria-current="page">Edit Interview Schedule</span>
+        </nav>
+        <div>
+                    <span th:text="'Created on ' + ${interviewSchedule.createdDate.toLocalDate()}
+                    + ', last update by ' + ${interviewSchedule.lastModifiedBy}
+                    + ' on ' + ${interviewSchedule.lastModifiedDate.toLocalDate()}"
+                          class="me-3"></span>
+        </div>
+      </div>
+    </div>
+
+    <div class="bg-light p-3 me-3">
+      <form th:action="@{'/interview-schedule/edit/' + ${interviewScheduleDto.scheduleId}}" method="post" th:object="${interviewScheduleDto}" class="row">
+        <th:block th:if="${interviewScheduleDto.scheduleStatus.name() eq 'FAILED_INTERVIEW'}">
+          <input hidden th:field="*{scheduleId}" th:value="*{scheduleId}">
+          <!--            table -->
+          <table class="col-5">
+            <tr>
+              <td>Schedule title<span class="text-danger">*</span>:</td>
+              <td><input disabled class="form-control" type="text" th:field="*{scheduleTitle}"></td>
+            </tr>
+            <tr th:if="${#fields.hasErrors('scheduleTitle')}">
+              <td></td>
+              <td><p th:errors="*{scheduleTitle}" class="text-danger"></p></td>
+            </tr>
+            <tr>
+              <td>Candidate name<span class="text-danger">*</span>:</td>
+              <td>
+                <select disabled th:field="*{candidateSchedule}" class="form-select form-select" >
+                  <th:block th:each="candidate : ${candidateList}">
+                    <option th:value="${candidate.candidateId}" th:text="${candidate.candidateFullname}"></option>
+                  </th:block>
+                </select>
+              </td>
+            </tr>
+            <tr th:if="${#fields.hasErrors('candidateSchedule')}">
+              <td></td>
+              <td><p th:errors="*{candidateSchedule}" class="text-danger"></p></td>
+            </tr>
+            <tr >
+              <td>Schedule: </td>
+              <td><input disabled class="form-control"  type="date" th:field="*{interviewDate}"></td>
+            </tr>
+            <tr th:if="${#fields.hasErrors('interviewDate')}">
+              <td></td>
+              <td><p th:errors="*{interviewDate}" class="text-danger"></p></td>
+            </tr>
+            <tr>
+              <td></td>
+              <td>
+                <div class="row">
+                  <div class="col-2 text-center my-auto">From</div>
+                  <div class="col-4">
+                    <input disabled type="time" class="form-control" th:field="*{interviewStartTime}">
+                  </div>
+                  <div class="col-2 text-center my-auto">To</div>
+                  <div class="col-4">
+                    <input disabled type="time" class="form-control" th:field="*{interviewEndTime}">
+                  </div>
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <td></td>
+              <td>
+                <p th:errors="*{interviewDate}" class="text-danger"></p>
+                <p th:errors="*{interviewStartTime}" class="text-danger"></p>
+                <p th:errors="*{interviewEndTime}" class="text-danger"></p>
+                <p th:errors="*{interviewDateInPresentOrFuture}" class="text-danger"></p>
+                <p th:errors="*{interviewStartTimeBeforeEndTime}" class="text-danger"></p>
+              </td>
+            </tr>
+            <tr>
+              <td>Notes: </td>
+              <td>
+                <div class="mb-3">
+                  <textarea disabled th:field="*{scheduleNotes}" class="form-control" id="notes" rows="3"></textarea>
+                </div>
+              </td>
+            </tr>
+          </table>
+          <div class="col-2"></div>
+          <table class="col-5">
+            <tr>
+              <td>Interviewer: </td>
+              <td>
+                <select disabled th:field="*{userInterviewer}" class="form-select" multiple>
+                  <th:block th:each="interviewer : ${interviewers}">
+                    <option th:value="${interviewer.id}" th:text="${interviewer.userFullname}"></option>
+                  </th:block>
+                </select>
+              </td>
+            </tr>
+            <tr th:if="${#fields.hasErrors('userInterviewer')}">
+              <td></td>
+              <td><p th:errors="*{userInterviewer}" class="text-danger"></p></td>
+            </tr>
+            <tr >
+              <td>Location: </td>
+              <td><input disabled type="text" class="form-control" th:field="*{scheduleLocation}"></td>
+            </tr>
+            <tr th:if="${#fields.hasErrors('scheduleLocation')}">
+              <td></td>
+              <td><p th:errors="*{scheduleLocation}" class="text-danger"></p></td>
+            </tr>
+            <tr>
+              <td>Recruiter owner:</td>
+              <td>
+                <th:block sec:authorize="hasAnyRole('ROLE_ADMIN','ROLE_MANAGER')">
+                  <select disabled th:field="*{recruiterOwner}" class="form-select form-select" >
+                    <th:block th:each="recruiter : ${recruiters}">
+                      <option th:value="${recruiter.id}" th:text="${recruiter.userFullname}"></option>
+                    </th:block>
+                  </select>
+                </th:block>
+                <th:block sec:authorize="hasRole('ROLE_RECRUITER')">
+                  <select disabled th:field="*{recruiterOwner}" class="form-select form-select" >
+                    <th:block th:each="recruiter : ${recruiters}" th:if="${recruiter.userName eq session.USERNAME_SESSION}">
+                      <option selected th:value="${recruiter.id}" th:text="${recruiter.userFullname}"></option>
+                    </th:block>
+                  </select>
+                </th:block>
+              </td>
+            </tr>
+            <tr th:if="${#fields.hasErrors('recruiterOwner')}">
+              <td></td>
+              <td><p th:errors="*{recruiterOwner}" class="text-danger"></p></td>
+            </tr>
+            <!--        <tr>-->
+            <!--          <td></td>-->
+            <!--          <td><a th:href="@{'?username='+${session.USERNAME_SESSION}}">Assign me</a></td>-->
+            <!--        </tr>-->
+            <tr>
+              <td>Status</td>
+              <td>
+                <select disabled th:field="*{scheduleStatus}" class="form-select form-select" >
+                  <th:block th:each="status : ${statusList}">
+                    <option th:value="${status.name()}" th:text="${status.toString()}"></option>
+                  </th:block>
+                </select>
+              </td>
+            </tr>
+            <tr th:if="${#fields.hasErrors('scheduleStatus')}">
+              <td></td>
+              <td><p th:errors="*{scheduleStatus}" class="text-danger"></p></td>
+            </tr>
+            <tr>
+              <td>Meeting ID: </td>
+              <td >
+                <input disabled type="text" th:field="*{scheduleMeetId}" class="form-control">
+              </td>
+            </tr>
+            <tr th:if="${#fields.hasErrors('scheduleMeetId')}">
+              <td></td>
+              <td><p th:errors="*{scheduleMeetId}" class="text-danger"></p></td>
+            </tr>
+          </table>
+          <div class="m-3 mt-5 text-center">
+            <a class="btn btn-warning px-3 mx-3" th:href="@{/interview-schedule/view-list}" role="button">Cancel</a>
+          </div>
+        </th:block>
+        <th:block th:unless="${interviewScheduleDto.scheduleStatus.name() eq 'FAILED_INTERVIEW'}">
+          <input hidden th:field="*{scheduleId}" th:value="*{scheduleId}">
+          <!--            table -->
+          <table class="col-5">
+            <tr>
+              <td>Schedule title<span class="text-danger">*</span>:</td>
+              <td><input class="form-control" type="text" th:field="*{scheduleTitle}"></td>
+            </tr>
+            <tr th:if="${#fields.hasErrors('scheduleTitle')}">
+              <td></td>
+              <td><p th:errors="*{scheduleTitle}" class="text-danger"></p></td>
+            </tr>
+            <tr>
+              <td>Candidate name<span class="text-danger">*</span>:</td>
+              <td>
+                <select th:field="*{candidateSchedule}" class="form-select form-select" >
+                  <th:block th:each="candidate : ${candidateList}">
+                    <option th:value="${candidate.candidateId}" th:text="${candidate.candidateFullname}"></option>
+                  </th:block>
+                </select>
+              </td>
+            </tr>
+            <tr th:if="${#fields.hasErrors('candidateSchedule')}">
+              <td></td>
+              <td><p th:errors="*{candidateSchedule}" class="text-danger"></p></td>
+            </tr>
+            <tr >
+              <td>Schedule: </td>
+              <td><input class="form-control"  type="date" th:field="*{interviewDate}"></td>
+            </tr>
+            <tr th:if="${#fields.hasErrors('interviewDate')}">
+              <td></td>
+              <td><p th:errors="*{interviewDate}" class="text-danger"></p></td>
+            </tr>
+            <tr>
+              <td></td>
+              <td>
+                <div class="row">
+                  <div class="col-2 text-center my-auto">From</div>
+                  <div class="col-4">
+                    <input type="time" class="form-control" th:field="*{interviewStartTime}">
+                  </div>
+                  <div class="col-2 text-center my-auto">To</div>
+                  <div class="col-4">
+                    <input type="time" class="form-control" th:field="*{interviewEndTime}">
+                  </div>
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <td></td>
+              <td>
+                <p th:errors="*{interviewDate}" class="text-danger"></p>
+                <p th:errors="*{interviewStartTime}" class="text-danger"></p>
+                <p th:errors="*{interviewEndTime}" class="text-danger"></p>
+                <p th:errors="*{interviewDateInPresentOrFuture}" class="text-danger"></p>
+                <p th:errors="*{interviewStartTimeBeforeEndTime}" class="text-danger"></p>
+              </td>
+            </tr>
+            <tr>
+              <td>Notes: </td>
+              <td>
+                <div class="mb-3">
+                  <textarea th:field="*{scheduleNotes}" class="form-control" rows="3"></textarea>
+                </div>
+              </td>
+            </tr>
+          </table>
+          <div class="col-2"></div>
+          <table class="col-5">
+            <tr>
+              <td>Interviewer: </td>
+              <td>
+                <select th:field="*{userInterviewer}" class="form-select" multiple>
+                  <th:block th:each="interviewer : ${interviewers}">
+                    <option th:value="${interviewer.id}" th:text="${interviewer.userFullname}"></option>
+                  </th:block>
+                </select>
+              </td>
+            </tr>
+            <tr th:if="${#fields.hasErrors('userInterviewer')}">
+              <td></td>
+              <td><p th:errors="*{userInterviewer}" class="text-danger"></p></td>
+            </tr>
+            <tr >
+              <td>Location: </td>
+              <td><input type="text" class="form-control" th:field="*{scheduleLocation}"></td>
+            </tr>
+            <tr th:if="${#fields.hasErrors('scheduleLocation')}">
+              <td></td>
+              <td><p th:errors="*{scheduleLocation}" class="text-danger"></p></td>
+            </tr>
+            <tr>
+              <td>Recruiter owner:</td>
+              <td>
+                <th:block sec:authorize="hasAnyRole('ROLE_ADMIN','ROLE_MANAGER')">
+                  <select th:field="*{recruiterOwner}" class="form-select form-select" >
+                    <th:block th:each="recruiter : ${recruiters}">
+                      <option th:value="${recruiter.id}" th:text="${recruiter.userFullname}"></option>
+                    </th:block>
+                  </select>
+                </th:block>
+                <th:block sec:authorize="hasRole('ROLE_RECRUITER')">
+                  <select th:field="*{recruiterOwner}" class="form-select form-select" >
+                    <th:block th:each="recruiter : ${recruiters}" th:if="${recruiter.userName eq session.USERNAME_SESSION}">
+                      <option selected th:value="${recruiter.id}" th:text="${recruiter.userFullname}"></option>
+                    </th:block>
+                  </select>
+                </th:block>
+              </td>
+            </tr>
+            <tr th:if="${#fields.hasErrors('recruiterOwner')}">
+              <td></td>
+              <td><p th:errors="*{recruiterOwner}" class="text-danger"></p></td>
+            </tr>
+            <!--        <tr>-->
+            <!--          <td></td>-->
+            <!--          <td><a th:href="@{'?username='+${session.USERNAME_SESSION}}">Assign me</a></td>-->
+            <!--        </tr>-->
+            <tr>
+              <td></td>
+              <td>
+                <input hidden th:field="*{scheduleStatus}" th:value="*{scheduleStatus}" class="form-control">
+              </td>
+            </tr>
+            <tr th:if="${#fields.hasErrors('scheduleStatus')}">
+              <td></td>
+              <td><p th:errors="*{scheduleStatus}" class="text-danger"></p></td>
+            </tr>
+            <tr>
+              <td>Meeting ID: </td>
+              <td >
+                <input type="text" th:field="*{scheduleMeetId}" class="form-control">
+              </td>
+            </tr>
+            <tr th:if="${#fields.hasErrors('scheduleMeetId')}">
+              <td></td>
+              <td><p th:errors="*{scheduleMeetId}" class="text-danger"></p></td>
+            </tr>
+          </table>
+          <div class="m-3 mt-5 text-center">
+            <button type="submit" class="btn btn-primary">Submit</button>
+            <a class="btn btn-warning px-3 mx-3" th:href="@{/interview-schedule/view-list}" role="button">Cancel</a>
+          </div>
+        </th:block>
+      </form>
+    </div>
+
+
+  </div>
+</main>
+<!-- partial -->
+</body>
+</html>

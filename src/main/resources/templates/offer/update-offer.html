@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+<head>
+    <title>Edit Offer</title>
+    <th:block th:insert="fragment/header-insert"></th:block>
+    <style>
+        td:not(:first-child) {
+            padding-top: 5px;
+            padding-bottom: 5px;
+        }
+    </style>
+</head>
+
+
+<body>
+<main class="d-flex">
+    <!--    Sidebar-->
+    <th:block th:insert="fragment/sidebar-ver-2"></th:block>
+
+    <!--    Main content-->
+    <div class="w-100 ms-4">
+        <div class="d-flex justify-content-between">
+            <div>
+                <h1 class="py-3">Offer</h1>
+            </div>
+            <th:block th:insert="fragment/user-button"></th:block>
+
+
+        </div>
+        <!--            -->
+        <div class="">
+            <div class="d-flex justify-content-between">
+                <nav class="breadcrumb">
+                    <a class="breadcrumb-item text-decoration-none" th:href="@{/offer}">Offer List </a>
+                    <span class="breadcrumb-item active" aria-current="page">Edit Offer</span>
+                </nav>
+                <div>
+                    <div>
+                    <span th:with="today=${T(java.time.LocalDate).now()}"
+                          th:text="|Created on ${offerDto.createdDate}, last updated by ${offerDto.lastModifiedBy} on | +
+                         (${offerDto.lastModifiedDate} == today ? 'today' : ${offerDto.lastModifiedDate})" class="me-3"></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-light p-3 me-3">
+            <form class="row" method="post" th:object="${offerDto}">
+                <div class="col-5">
+                    <table class="border-0">
+                        <tr class="mb-3">
+                        <tr class="mb-3">
+                            <td>Candidate <span class="text-danger">*</span></td>
+                            <td>
+                                <input th:field="*{candidate}" th:value="*{candidate}" type="text" class="form-control" readonly>
+                                <input type="hidden" th:field="*{interviewScheduleId}" th:value="*{interviewScheduleId}" >
+
+                            </td>
+                        </tr>
+                        <tr th:if="${#fields.hasErrors('candidate')}">
+                            <td></td>
+                            <td><span th:errors="*{candidate}" class="text-danger"></span></td>
+                        </tr>
+                        </tr>
+                        <tr class="mb-3">
+                            <td>Position <span class="text-danger">*</span></td>
+                            <td><select th:field="*{positionOffer}" class="form-select">
+                                <option th:each="position : ${positionList}" th:value="${position.positionId}"
+                                        th:text="${position.positionDesc}"></option>
+                            </select>
+                            </td>
+                        <tr th:if="${#fields.hasErrors('positionOffer')}">
+                            <td></td>
+                            <td><span th:errors="*{positionOffer}" class="text-danger"></span></td>
+                        </tr>
+                        </tr>
+                        <tr class="mb-3">
+                            <td>Approved by <span class="text-danger">*</span></td>
+                            <td><select th:field="*{userApprovedId}" class="form-select">
+                                <option th:each="user : ${managerList}" th:value="${user.id}"
+                                        th:text="${user.userName}"></option>
+                            </select>
+                            </td>
+                        <tr th:if="${#fields.hasErrors('userApprovedId')}">
+                            <td></td>
+                            <td><span th:errors="*{userApprovedId}" class="text-danger"></span></td>
+                        </tr>
+                        </tr>
+                        <tr class="mb-3">
+                            <td>Status <span class="text-danger">*</span></td>
+                            <td><select th:field="*{status}" type="text" class="form-select">
+                                <option value="Waiting for approval" >Waiting for approval</option>
+                                <option value="Approved offer" hidden>Approved offer</option>
+                                <option value="Rejected offer" hidden>Rejected offer</option>
+                                <option value="Accepted offer" hidden>Accepted offer</option>
+                                <option value="Declined offer" hidden>Declined offer</option>
+                                <option value="Cancelled offer" hidden>Cancelled offer</option>
+                            </select>
+                            </td>
+
+                        </tr>
+                        <tr class="mb-3">
+                            <td>Interview <span class="text-danger">*</span></td>
+                            <td><input id="interview-input" th:field="*{interviews}" th:value="*{interviews}" type="text" class="form-control" placeholder="Interview"
+                                       readonly>
+                            </td>
+
+                        </tr>
+                        <tr class="mb-3">
+                            <td>Contract start<span class="text-danger">* </span></td>
+                            <td>
+                                <div class="row d-flex align-items-center">
+                                    <div class="col-2">
+                                        From
+                                    </div>
+                                    <div class="col-4">
+                                        <input th:field="*{offerContFrom}" type="date" class="form-control" >
+                                    </div>
+                                    <div class="col-2">
+                                        To
+                                    </div>
+                                    <div class="col-4">
+                                        <input th:field="*{offerContTo}" type="date" class="form-control" >
+                                    </div>
+                                </div>
+                            </td>
+                        <tr th:if="${#fields.hasErrors('startBeforeEnd')}">
+                            <td></td>
+                            <td><p th:errors="*{startBeforeEnd}" class="text-danger"></p></td>
+                        </tr>
+                        <tr th:if="${#fields.hasErrors('offerContFrom') or #fields.hasErrors('offerContTo')}">
+                            <td></td>
+                            <td>
+                                <span th:if="${#fields.hasErrors('offerContFrom')}" th:errors="*{offerContFrom}"
+                                      class="text-danger me-3 pe-5"></span>
+                                <span th:if="${#fields.hasErrors('offerContTo')}" th:errors="*{offerContTo}"
+                                      class="text-danger ms-5 ps-5"></span>
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td>Interview notes</td>
+                            <td>
+                                <div class="mb-3">
+                                    <textarea id="note-input" th:field="*{notes}" th:value="*{notes}" class="form-control mt-3" rows="2"
+                                              placeholder="Interview Notes" readonly></textarea>
+                                </div>
+                            </td>
+                        </tr>
+                    </table>
+
+                </div>
+
+                <div class="col-2"></div>
+
+                <div class="col-5">
+                    <table class="border-0 w-100">
+                        <tr class="mb-3">
+                            <td class="w-25">Contract type <span class="text-danger">*</span></td>
+                            <td><select th:field="*{contractType}" type="text" class="form-select" >
+                                <option th:each="value : ${enumContractType}"
+                                        th:value="${value}"
+                                        th:text="${value}"></option>
+                            </select>
+                            </td>
+                        <tr th:if="${#fields.hasErrors('contractType')}">
+                            <td></td>
+                            <td><span th:errors="*{contractType}" class="text-danger"></span></td>
+                        </tr>
+                        </tr>
+                        <tr class="mb-3">
+                            <td>Level <span class="text-danger">*</span></td>
+                            <td><select th:field="*{jobLevelId}" type="text" class="form-select" >
+                                <option th:each="level : ${levelList}" th:value="${level.levelId}"
+                                        th:text="${level.levelDesc}"></option>
+                            </select>
+                            </td>
+                        <tr th:if="${#fields.hasErrors('jobLevelId')}">
+                            <td></td>
+                            <td><span th:errors="*{jobLevelId}" class="text-danger"></span></td>
+                        </tr>
+                        </tr>
+                        <tr class="mb-3">
+                            <td>Department <span class="text-danger">*</span></td>
+                            <td><select th:field="*{departmentOfferId}" class="form-select">
+                                <option th:each="depart : ${departList}" th:value="${depart.departmentId}"
+                                        th:text="${depart.departmentName}"></option>
+                            </select>
+                            </td>
+                        <tr th:if="${#fields.hasErrors('departmentOfferId')}">
+                            <td></td>
+                            <td><span th:errors="*{departmentOfferId}" class="text-danger"></span></td>
+                        </tr>
+                        </tr>
+                        <tr class="mb-3">
+                            <td>Recruiter owner <span class="text-danger">*</span></td>
+                            <td><select th:field="*{userRecruiterId}" class="form-select" id="recruiterOwner" readonly
+                                        onmousedown="return false;" style="background-color: #e9ecef">
+                                <option th:each="user : ${recruiterList}" th:value="${user.id}"
+                                        th:text="${user.userName}"></option>
+                            </select>
+                            </td>
+                        <tr th:if="${#fields.hasErrors('userRecruiterId')}">
+                            <td></td>
+                            <td><p th:errors="*{userRecruiterId}" class="text-danger"></p></td>
+                        </tr>
+                        </tr>
+
+                        <tr class="mb-3">
+                            <td>Due date <span class="text-danger">*</span></td>
+                            <td><input th:field="*{offerDate}" type="date" class="form-control" >
+                            </td>
+                        <tr th:if="${#fields.hasErrors('offerDate')}">
+                            <td></td>
+                            <td><span th:errors="*{offerDate}" class="text-danger"></span></td>
+                        </tr>
+                        </tr>
+
+                        <tr>
+                            <td>Basic salary</td>
+                            <td><input th:field="*{offerSalary}" type="text" class="form-control"
+                                       placeholder="Basic salary" ></td>
+                        <tr th:if="${#fields.hasErrors('offerSalary')}">
+                            <td></td>
+                            <td><span th:errors="*{offerSalary}" class="text-danger"></span></td>
+                        </tr>
+                        </tr>
+
+                        <tr>
+                            <td>Notes</td>
+                            <td>
+                                <div class="mb-3">
+                                    <textarea th:field="*{offerNotes}" class="form-control" rows="3"
+                                              placeholder="Type a note" ></textarea>
+                                </div>
+                            </td>
+                        <tr th:if="${#fields.hasErrors('offerNotes')}">
+                            <td></td>
+                            <td><span th:errors="*{offerNotes}" class="text-danger"></span></td>
+                        </tr>
+                        </tr>
+                    </table>
+
+                </div>
+                <div class="text-center mt-5">
+                    <button type="submit" class="btn btn-primary px-3 me-5">Submit</button>
+                    <button type="reset" class="btn btn-warning px-4 ms-5">Cancel</button>
+                </div>
+            </form>
+            <!--  Form -->
+        </div>
+    </div>
+</main>
+<!-- partial -->
+
+</body>
+</html>

@@ -1,0 +1,43 @@
+spring:
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/dev_ims_db
+    username: root
+    password: nntuan203
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+      format_sql: true
+    database-platform: org.hibernate.dialect.MySQL5InnoDBDialect
+
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: dung1709cht@gmail.com
+    password: zjlyupcoereyeogg
+    protocol: smtp
+    properties:
+      mail.smtp.starttls.enable: true
+      mail.smtp.starttls.required: false
+      mail.smtp.auth: true
+
+  servlet:
+    multipart:
+        max-file-size: 4MB
+        max-request-size: 4MB
+
+  task:
+    scheduling:
+      pool:
+        size: 1
+      shutdown:
+        await-termination: true
+        await-termination-period: 30s
+      thread-name-prefix: scheduled-task-shutdown-
+
+server:
+  port: 8080
+
+
+

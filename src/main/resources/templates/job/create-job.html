@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+<head>
+    <title>Create Jobs</title>
+    <th:block th:insert="fragment/header-insert"></th:block>
+    <style>
+        td:not(:first-child) {
+            padding-top: 5px;
+            padding-bottom: 5px;
+        }
+    </style>
+</head>
+
+
+<body>
+<main class="d-flex">
+    <!--    Sidebar-->
+    <th:block th:insert="fragment/sidebar-ver-2"></th:block>
+
+    <!--    Main content-->
+    <div class="w-100 ms-4">
+        <div class="d-flex justify-content-between">
+            <div>
+                <h1 class="py-3">Jobs</h1>
+            </div>
+            <th:block th:insert="fragment/user-button"></th:block>
+
+
+        </div>
+        <!--            -->
+        <div class="">
+            <div class="d-flex justify-content-between">
+                <nav class="breadcrumb">
+                    <a class="breadcrumb-item text-decoration-none" th:href="@{/jobs}">Jobs List </a>
+                    <span class="breadcrumb-item active" aria-current="page">Create Jobs</span>
+                </nav>
+
+            </div>
+        </div>
+
+        <div class="bg-light p-3 me-3">
+            <form class="row" method="post" th:object="${jobDto}">
+                <div class="col-5">
+                    <table class="border-0">
+                        <tr class="mb-3">
+                        <tr class="mb-3">
+                            <td> Jobs Title <span class="text-danger">*</span></td>
+                            <td>
+                                <input th:field="*{jobTitle}" type="text" class="form-control"
+                                       th:value="${jobDto.getJobTitle()}">
+                            </td>
+                        </tr>
+                        <tr th:if="${#fields.hasErrors('jobTitle')}">
+                            <td></td>
+                            <td><span th:errors="*{jobTitle}" class="text-danger"></span></td>
+                        </tr>
+
+
+                        <tr class="mb-3">
+                            <td> Start date  </td>
+                            <td>
+                                <input th:field="*{jobStart}" type="date" class="form-control"
+                                       th:value="${jobDto.getJobStart()}">
+                            </td>
+                        <tr th:if="${#fields.hasErrors('jobStart')}">
+                            <td></td>
+                            <td><span th:errors="*{jobStart}" class="text-danger"></span></td>
+                        </tr>
+
+                        <tr class="mb-3">
+                            <td>Salary range<span class="text-danger">* </span></td>
+                            <td>
+                                <div class="row d-flex align-items-center">
+                                    <div class="col-2">
+                                        From
+                                    </div>
+                                    <div class="col-4">
+                                        <input th:field="*{jobSalaryFrom}" type="text" class="form-control" >
+                                    </div>
+                                    <div class="col-2">
+                                        To<span class="text-danger">*</span>
+                                    </div>
+                                    <div class="col-4">
+                                        <input th:field="*{jobSalaryTo}" type="text" class="form-control" >
+                                    </div>
+                                </div>
+                            </td>
+                        <tr th:if="${#fields.hasErrors('salaryFromLessThanSalaryTo')}">
+                            <td></td>
+                            <td><p th:errors="*{salaryFromLessThanSalaryTo}" class="text-danger"></p></td>
+                        </tr>
+                        <tr>
+                            <td>
+                            </td>
+                        <tr th:if="${#fields.hasErrors('jobSalaryTo')}">
+                            <td></td>
+                            <td><span th:errors="*{jobSalaryTo}" class="text-danger"></span></td>
+                        </tr>
+                        <tr th:if="${#fields.hasErrors('jobSalaryFrom')}">
+                            <td></td>
+                            <td><span th:errors="*{jobSalaryFrom}" class="text-danger"></span></td>
+                        </tr>
+                        </tr>
+
+                        <tr>
+                            <td> Work Address </td>
+                            <td>
+                                <div class="mb-3 mt-3">
+                                    <input th:field="*{jobAddress}" type="text" class="form-control"
+                                           th:value="${jobDto.getJobAddress()}">
+                                </div>
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td>Descriptions</td>
+                            <td>
+                                <div class="mb-3">
+                                    <textarea id="note-input" th:field="*{jobDescription}" th:value="*{jobDescription}" class="form-control mt-3" rows="2"
+                                              placeholder="Interview Notes" readonly></textarea>
+                                </div>
+                            </td>
+                        </tr>
+                    </table>
+
+                </div>
+
+                <div class="col-2"></div>
+
+                <div class="col-5">
+                    <table class="border-0 w-100">
+                        <tr class="mb-3">
+                            <td class="w-25">Skills <span class="text-danger">*</span></td>
+                            <td>
+                                <select th:field="*{skills}" class="choices-multiple-remove-button" multiple>
+                                    <option th:each="skill : ${listSkills}" th:value="${skill.skillsId}"
+                                            th:text="${skill.skillsDesc}"
+                                    ></option>
+                                </select>
+                            </td>
+                        <tr th:if="${#fields.hasErrors('skills')}">
+                            <td></td>
+                            <td><span th:errors="*{skills}" class="text-danger"></span></td>
+                        </tr>
+                        <tr class="mb-3">
+                            <td>End Date <span class="text-danger">*</span></td>
+                            <td>  <input th:field="*{jobEnd}" type="date" class="form-control"
+                                         th:value="${jobDto.getJobEnd()}">
+
+                            </td>
+                        <tr th:if="${#fields.hasErrors('jobEnd')}">
+                            <td></td>
+                            <td><span th:errors="*{jobEnd}" class="text-danger"></span></td>
+                        </tr>
+
+
+                    </table>
+
+                </div>
+                <div class="text-center mt-5">
+                    <button type="submit" class="btn btn-primary px-3 me-5">Submit</button>
+                    <button type="reset" class="btn btn-warning px-4 ms-5">Cancel</button>
+                </div>
+            </form>
+            <!--  Form -->
+        </div>
+    </div>
+</main>
+<!-- partial -->
+<script src="/js/multiselectList.js"></script>
+
+</body>
+</html>

@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+<head>
+    <title>View Interview Schedule Detail</title>
+    <th:block th:insert="fragment/header-insert"></th:block>
+    <style>
+        td:not(:first-child) {
+            padding-top:20px;
+            padding-bottom:20px;
+        }
+    </style>
+</head>
+
+
+<body>
+<main class="d-flex">
+    <!--    Sidebar-->
+    <th:block th:insert="fragment/sidebar-ver-2"></th:block>
+
+    <!--    Main content-->
+    <div class="w-100 ms-4">
+        <div class="d-flex justify-content-between">
+            <div>
+                <h1 class="py-3">Interview Schedule</h1>
+            </div>
+            <th:block th:insert="fragment/user-button"></th:block>
+
+
+        </div>
+        <!--            -->
+        <div class="">
+            <!--            Phần tiêu đề phụ nếu cần sử dụng-->
+            <p class=" fst-italic" th:text="'Welcome ' + ${session.FULLNAME_SESSION} + ' to Interview Schedule List'">
+            </p>
+            <div class="d-flex justify-content-between">
+                <nav class="breadcrumb">
+                    <a class="breadcrumb-item text-decoration-none" th:href="@{/interview-schedule/view-list}">Interview
+                        Schedule List</a>
+                    <span class="breadcrumb-item active" aria-current="page">Interview Schedule Detail</span>
+                </nav>
+                <div>
+                    <span th:text="'Created on ' + ${interviewSchedule.createdDate.toLocalDate()}
+                    + ', last update by ' + ${interviewSchedule.lastModifiedBy}
+                    + ' on ' + ${interviewSchedule.lastModifiedDate.toLocalDate()}"
+                    class="me-3"></span>
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-light p-3 row">
+            <!--            table -->
+            <table class="col-5">
+                <tr>
+                    <td>Schedule title: </td>
+                    <td th:text="${interviewSchedule.scheduleTitle}"></td>
+                </tr>
+                <tr>
+                    <td>Candidate name:</td>
+                    <td th:text="${interviewSchedule.candidateSchedule.candidateFullname}"></td>
+                </tr>
+                <tr >
+                    <td>Schedule: </td>
+                    <td th:text="${interviewSchedule.interviewDate}"></td>
+                </tr>
+                <tr>
+                    <td>Status</td>
+                    <td th:text="${interviewSchedule.scheduleStatus.toString()}"></td>
+                </tr>
+                <tr>
+                    <td>Notes: </td>
+                    <td >
+                        <th:block th:if="${interviewSchedule.scheduleNotes == null}">
+                            N/A
+                        </th:block>
+                        <th:block th:unless="${interviewSchedule.scheduleNotes == null}">
+                            [[${interviewSchedule.scheduleNotes}]]
+                        </th:block>
+                    </td>
+                </tr>
+            </table>
+            <div class="col-2"></div>
+            <table class="col-5">
+                <tr>
+                    <td>Asignee: </td>
+                    <td>
+                        <th:block th:if="${#lists.size(interviewSchedule.userInterviewer) > 0}">
+                            <!-- Kiểm tra nếu danh sách không rỗng -->
+                            <th:block th:each="interviewer, iterStat : ${interviewSchedule.userInterviewer}">
+                                <!-- Lặp qua từng phần tử trong danh sách, sử dụng iterStat để kiểm soát vị trí hiện tại của vòng lặp -->
+                                <th:block th:if="${iterStat.last}">
+                                    <!-- Kiểm tra nếu đây là phần tử cuối cùng trong danh sách -->
+                                    <span th:text="${interviewer.userFullname}"></span>
+                                    <!-- Sử dụng ${interviewer} để hiển thị giá trị của phần tử cuối cùng trong danh sách -->
+                                </th:block>
+                                <th:block th:unless="${iterStat.last}">
+                                    <!-- Kiểm tra nếu phần tử hiện tại không phải là phần tử cuối cùng trong danh sách -->
+                                    <span th:text="${interviewer.userFullname} +', '"></span>
+                                    <!-- Sử dụng ${interviewer} để hiển thị giá trị của các phần tử còn lại trong danh sách -->
+                                </th:block>
+                            </th:block>
+                        </th:block>
+                    </td>
+                </tr>
+                <tr >
+                    <td>Location: </td>
+                    <td th:text="${interviewSchedule.scheduleLocation}"></td>
+                </tr>
+                <tr>
+                    <td>Recruiter owner:</td>
+                    <td th:text="${interviewSchedule.candidateSchedule.userRecruiter.userFullname}"></td>
+                </tr>
+                <tr>
+                    <td>Result</td>
+                    <td>
+                        <th:block th:if="${interviewSchedule.scheduleResult == null}">
+                            N/A
+                        </th:block>
+                        <th:block th:unless="${interviewSchedule.scheduleResult == null}">
+                            [[${interviewSchedule.scheduleResult}]]
+                        </th:block>
+                    </td>
+                </tr>
+                <tr>
+                    <td>Meeting ID: </td>
+                    <td >
+                        <a th:href="@{'http://www.'+${interviewSchedule.scheduleMeetId}}" th:text="${interviewSchedule.scheduleMeetId}"></a>
+                    </td>
+                </tr>
+            </table>
+            <div class="m-3 mt-5 text-center">
+                <th:block sec:authorize="hasAnyRole('ROLE_ADMIN','ROLE_RECRUITER','ROLE_MANAGER')">
+                    <a class="btn btn-primary px-4 mx-3" th:href="@{'/interview-schedule/submit-result/' + ${interviewSchedule.scheduleId}}" role="button">Submit result</a>
+                    <a class="btn btn-primary px-4 mx-3" th:href="@{'/interview-schedule/edit/' + ${interviewSchedule.scheduleId}}" role="button">Edit</a>
+                </th:block>
+                <a class="btn btn-warning px-3 mx-3" th:href="@{/interview-schedule/view-list}" role="button">Cancel</a>
+            </div>
+        </div>
+
+
+    </div>
+</main>
+<!-- partial -->
+</body>
+</html>

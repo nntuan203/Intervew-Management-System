@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns="http://www.w3.org/1999/html">
+<head>
+    <meta charset="UTF-8">
+    <title>IMS Login</title>
+    <link th:href="@{/css/login.css}" rel="stylesheet">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@700&family=Poppins:wght@400;500;600&display=swap">
+</head>
+<body>
+<div class="center">
+    <h1>Login</h1>
+    <form method="post" th:action = "@{/authentication}" th:object="${userLoginDto}">
+        <div class="txt_field">
+            <input type="text" id = "name" th:field= "*{username}" required>
+            <span></span>
+            <label>Username</label>
+        </div>
+        <div class="txt_field">
+            <input type="password" th:field="*{password}"required>
+            <span></span>
+            <label>Password</label>
+        </div>
+        <small th:if="${invalid}" class="errors" style = "color: red">
+            Invalid username/ password. Please try again
+        </small>
+        <div class = "signup_link">
+            <input type = "checkbox" name = "remember-me">Remember Me</input>
+            <span></span>
+        </div>
+        <input type="submit" value="Login">
+        <div class="signup_link">
+            <a href = "/forgot"><div class="pass">Forgot Password?</div></a>
+        </div>
+
+    </form>
+</div>
+</body>
+</html>

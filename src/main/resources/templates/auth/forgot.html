@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>IMS Resset</title>
+  <link th:href="@{/css/login.css}" rel="stylesheet">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@700&family=Poppins:wght@400;500;600&display=swap">
+</head>
+<body>
+<div class="center">
+  <h1>Resset Password</h1>
+  <form th:action = "@{/forgot}" th:object="${emailDto}" method="post">
+    <div class="txt_field">
+      <input th:field="*{email}" type="text" class="form-control"
+             placeholder="Type an email" required title="You have to type an email">
+      <small th:if="${#fields.hasErrors('email')}" th:errors="*{email}" class="errors">Error message</small>
+      <small th:if="${isEmailNotExist}" class="errors" style = "color: red">
+        Email does not exist
+      </small>
+    </div>
+    <input type="submit" value="Send">
+    <div class="signup_link">
+      Do you have account? <a href="/login">Login</a>
+    </div>
+  </form>
+</div>
+</body>
+</html>

@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+<head>
+    <title>List Offer</title>
+    <th:block th:insert="fragment/header-insert"></th:block>
+
+</head>
+<title id="pageTitle">List Offer</title>
+
+<body>
+<main class="d-flex">
+    <!--    Sidebar-->
+    <th:block th:insert="fragment/sidebar-ver-2"></th:block>
+
+    <!--    Main content-->
+    <div class="w-100 ms-4">
+        <div class="d-flex justify-content-between">
+            <div>
+                <h1 class="py-3">Offer List</h1>
+            </div>
+            <th:block th:insert="fragment/user-button"></th:block>
+
+
+        </div>
+        <!--            -->
+        <div class="">
+            <!--            Phần tiêu đề phụ nếu cần sử dụng-->
+            <p class="h4 fst-italic" th:text="'Welcome ' + ${session.USERNAME_SESSION} + ' to Offer List'">
+            </p>
+            <span sec:authorize="hasRole('ROLE_MANAGER')">
+         <div class="fst-italic">
+          You have [[${offerApproveSize}]] open offer(s) to take action.
+        <a th:href="@{/offer(valueSearch='', depart='', status='Waiting for approval')}">Check</a>
+        </div>
+       </span>
+
+            <!-- Success -->
+            <div th:if="${messSuccess}">
+                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                    <strong>Success !</strong>
+                    <span th:text="${messSuccess}"></span>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"
+                            aria-label="Close"></button>
+                </div>
+            </div>
+            <!-- Success -->
+            <!-- Fail -->
+            <div th:if="${messFail}">
+                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                    <strong>Error !</strong>
+                    <span th:text="${messFail}"></span>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"
+                            aria-label="Close"></button>
+                </div>
+            </div>
+            <!-- Fail -->
+
+            <div>
+                <!--                Phần search nếu có-->
+                <div class="d-flex justify-content-between">
+                    <form class="d-flex w-75" method="get">
+                        <input th:value="${valueSearch}" type="search" class="form-control rounded m-2"
+                               placeholder="Search"
+                               aria-label="Search"
+                               aria-describedby="search-addon" name="valueSearch"/>
+                        <button type="submit" class="btn"><i class="fas fa-search"></i></button>
+                        <select class="form-select form-select-sm m-2" aria-label=".form-select-sm example"
+                                name="depart">
+                            <option value="">-- All Department --</option>
+                            <th:block th:each="departement : ${departList}" th:value="depart">
+                                <option th:value="${departement.departmentName}" th:text="${departement.departmentName}"
+                                        th:selected="${depart == departement.departmentName }">
+                                </option>
+                            </th:block>
+                        </select>
+                        <select class="form-select form-select-sm m-2" aria-label=".form-select-sm example"
+                                name="status">
+                            <option value="">-- All Status --</option>
+                            <option value="Waiting for approval" th:selected="${status == 'Waiting for approval'}">Waiting for approval
+
+                            <option value="Approved offer" th:selected="${status == 'Approved offer'}">Approved offer
+                            </option>
+                            <option value="Rejected offer" th:selected="${status == 'Rejected offer'}">Rejected offer
+                            </option>
+                            <option value="Waiting for response" th:selected="${status == 'Waiting for response'}">
+                                Waiting for response
+                            </option>
+                            <option value="Accepted offer" th:selected="${status == 'Accepted offer'}">Accepted offer
+                            </option>
+                            <option value="Declined offer" th:selected="${status == 'Declined offer'}">Declined offer
+                            </option>
+                            <option value="Cancelled offer" th:selected="${status == 'Cancelled offer'}">Cancelled
+                                offer
+                            </option>
+                        </select>
+                    </form>
+                    <div>
+                        <!-- Button trigger modal -->
+                        <i class="fas fa-file-export fa-2x p-2" data-bs-toggle="modal"
+                           data-bs-target="#exportModal"></i>
+                        <!-- Button trigger modal -->
+
+                        <a th:href="@{/offer/create}"><i class="fa fa-plus-circle fa-2x p-2 text-dark" aria-hidden="true"></i>
+                        </a>
+
+
+                        <!-- Modal -->
+                        <div class="modal fade" id="exportModal" tabindex="-1" aria-labelledby="exampleModalLabel"
+                             aria-hidden="true">
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title text-center" id="exampleModalLabel">Export offer</h5>
+
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                                aria-label="Close"></button>
+                                    </div>
+                                    <form th:action="@{/offer/export}" th:object="${exportDateDto}" method="post">
+                                        <div class="modal-body text-center">
+                                            <td>
+                                                <div class="row d-flex align-items-center">
+                                                    <div class="col-2">
+                                                        From
+                                                    </div>
+                                                    <div class="col-4">
+                                                        <input th:field="*{dateFrom}" type="date" class="form-control my-3">
+                                                    </div>
+                                                    <div class="col-2">
+                                                        To
+                                                    </div>
+                                                    <div class="col-4">
+                                                        <input th:field="*{dateTo}"  type="date" class="form-control my-3">
+                                                    </div>
+                                                </div>
+                                            </td>
+
+                                            <div class="mt-3">
+                                                <div th:if="${#fields.hasAnyErrors()}" class="alert alert-danger">
+                                                    <ul>
+                                                        <li th:each="error : ${#fields.allErrors()}" th:text="${error}" />
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="modal-footer ">
+
+                                            <button type="submit" class="btn btn-primary">Submit</button>
+
+                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                                                Close
+                                            </button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-light p-3">
+            <!--            table -->
+            <table class="table table-hover table-responsive-xl table-striped ">
+                <thead>
+                <tr>
+                    <th scope="col">Candidate Name</th>
+                    <th scope="col">Email</th>
+                    <th scope="col">Approve</th>
+                    <th scope="col">Department</th>
+                    <th scope="col">Notes</th>
+                    <th scope="col">Status</th>
+                    <th scope="col">Action</th>
+                </tr>
+                </thead>
+                <tbody>
+                <th:block th:if="${offerList.getTotalElements()==0}">
+                    <p class="alert alert-warning text-center h4">No offer has been found !</p>
+                </th:block>
+                <th:block th:each="offer : ${offerList}">
+                    <tr class="">
+                        <td th:text="${offer.getCandidateName()}"></td>
+                        <td th:text="${offer.email}"></td>
+                        <td th:text="${offer.approve}"></td>
+                        <td th:text="${offer.department}"></td>
+                        <td th:text="${offer.note}"></td>
+                        <td th:text="${offer.status}"></td>
+                        <td>
+                            <a class="text-black" th:href="@{/offer/{offerId}(offerId=${offer.offerId})}"><i
+                                    class="far fa-eye"></i></a>
+                            <a sec:authorize="hasAnyRole('ROLE_RECRUITER','ROLE_ADMIN')"  class="text-black"
+                               th:href="@{/offer/update/{offerId}(offerId=${offer.offerId})}"><i
+                                    class="fas fa-edit"></i></a>
+                            <a sec:authorize="hasAnyRole('ROLE_MANAGER','ROLE_ADMIN')"  class="text-black px-1"
+                               th:href="@{/offer/approve/{offerId}(offerId=${offer.offerId})}"><i
+                                    class="fas fa-check"></i></a>
+                        </td>
+                    </tr>
+                </th:block>
+                </tbody>
+            </table>
+
+            <!--            Phần phân trang-->
+            <nav aria-label="Page navigation">
+                <ul class="pagination justify-content-between">
+                    <div></div>
+                    <div class="d-flex">
+
+                        <th:block th:unless="${offerList.getTotalElements()==0}">
+                            <th:block th:if="${pageNumber < totalPages}">
+                                <p class="p-2"
+                                   th:text="(((${pageNumber}-1)* ${pageSize}+1) + ' - ' + ${pageNumber} * ${pageSize} + ' / ' +  ${totalElements} + ' rows')"></p>
+                            </th:block>
+
+                            <th:block th:if="${pageNumber >= totalPages}">
+                                <p class="p-2"
+                                   th:text="(((${pageNumber}-1)* ${pageSize}+1) + ' - ' + ${totalElements} + ' / ' +  ${totalElements} + ' rows')"></p>
+                            </th:block>
+                        </th:block>
+
+
+                        <th:block th:if="${pageNumber > 1}">
+                            <li class="page-item">
+                                <a class="page-link"
+                                   th:href="@{/offer(pageNumber=${pageNumber}-1,valueSearch=${valueSearch},depart=${depart},status=${status})}"><
+                                    Prev</a>
+                            </li>
+                        </th:block>
+                        <th:block th:if="${pageNumber <= 1}">
+                            <li class="page-item disabled">
+                                <a class="page-link" tabindex="-1" aria-disabled="true">< Prev</a>
+                            </li>
+                        </th:block>
+                        <th:block th:if="${pageNumber < totalPages}">
+                            <li class="page-item">
+                                <a class="page-link"
+                                   th:href="@{/offer(pageNumber=${pageNumber}+1,valueSearch=${valueSearch},depart=${depart},status=${status})}">Next
+                                    ></a>
+                            </li>
+                        </th:block>
+                        <th:block th:if="${pageNumber >= totalPages}">
+                            <li class="page-item disabled">
+                                <a class="page-link" tabindex="-1" aria-disabled="true">Next ></a>
+                            </li>
+                        </th:block>
+                        </th:block>
+                    </div>
+                </ul>
+            </nav>
+        </div>
+    </div>
+</main>
+<!-- partial -->
+</body>
+</html>

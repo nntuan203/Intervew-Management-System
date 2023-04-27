@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+<head>
+    <title>List Jobs</title>
+    <th:block th:insert="fragment/header-insert"></th:block>
+
+</head>
+<title id="pageTitle">List Jobs</title>
+
+<body>
+<main class="d-flex">
+    <!--    Sidebar-->
+    <th:block th:insert="fragment/sidebar-ver-2"></th:block>
+
+    <!--    Main content-->
+    <div class="w-100 ms-4">
+        <div class="d-flex justify-content-between">
+            <div>
+                <h1 class="py-3">List Jobs</h1>
+            </div>
+            <th:block th:insert="fragment/user-button"></th:block>
+
+
+        </div>
+        <!--            -->
+        <div class="">
+            <!--            Phần tiêu đề phụ nếu cần sử dụng-->
+            <p class="h4 fst-italic" th:text="'Welcome ' + ${session.USERNAME_SESSION} + ' to List Jobs'">
+            </p>
+            <span sec:authorize="hasRole('ROLE_MANAGER')">
+
+       </span>
+
+            <!-- Success -->
+            <div th:if="${messSuccess}">
+                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                    <strong>Success !</strong>
+                    <span th:text="${messSuccess}"></span>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"
+                            aria-label="Close"></button>
+                </div>
+            </div>
+            <!-- Success -->
+            <!-- Fail -->
+            <div th:if="${messFail}">
+                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                    <strong>Error !</strong>
+                    <span th:text="${messFail}"></span>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"
+                            aria-label="Close"></button>
+                </div>
+            </div>
+            <!-- Fail -->
+
+            <div>
+                <!--                Phần search nếu có-->
+                <div class="d-flex justify-content-between">
+                    <form class="d-flex w-50" method="get">
+                        <input th:value="${valueSearch}" type="search" class="form-control rounded m-2"
+                               placeholder="Search"
+                               aria-label="Search"
+                               aria-describedby="search-addon" name="valueSearch"/>
+                        <button type="submit" class="btn"><i class="fas fa-search"></i></button>
+                        <select class="form-select form-select-sm m-2" aria-label=".form-select-sm example"
+                                name="status">
+                            <option value="">-- All Status --</option>
+                            <option th:each="statusEnum : ${statusList}"
+                                    th:value="${statusEnum.toString()}"
+                                    th:text="${statusEnum.toString()}"
+                                    th:selected="${statusEnum.toString() == status}">
+                            </option>
+                        </select>
+
+
+                    </form>
+                    <div>
+                        <!-- Button trigger modal -->
+                        <i class="fas fa-file-import fa-2x p-2" data-bs-toggle="modal"
+                           data-bs-target="#exportModal"></i>
+                        <!-- Button trigger modal -->
+
+                        <a th:href="@{/jobs/create}"><i class="fa fa-plus-circle fa-2x p-2 text-dark"
+                                                        aria-hidden="true"></i>
+                        </a>
+
+                        <!-- Modal -->
+                        <div class="modal fade" id="exportModal" tabindex="-1" aria-labelledby="exampleModalLabel"
+                             aria-hidden="true">
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title text-center" id="exampleModalLabel">Export offer</h5>
+
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                                aria-label="Close"></button>
+                                    </div>
+                                    <div class="modal-body text-center">
+                                        <form method="POST" enctype="multipart/form-data" action="/jobs/import">
+                                            <div class="form-group">
+                                                <input type="file" name="file" class="form-control-file mb-3" id="inputFile">
+                                            </div>
+                                        <div class="modal-footer ">
+                                            <button type="submit" class="btn btn-primary">Import</button>
+
+                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                        </div>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Modal -->
+
+
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-light p-3">
+            <!--            table -->
+            <table class="table table-hover table-responsive-xl table-striped ">
+                <thead>
+                <tr>
+                    <th scope="col">ID</th>
+                    <th scope="col">Job Title</th>
+                    <th scope="col">Required Skills</th>
+                    <th scope="col">Start date</th>
+                    <th scope="col">End Date</th>
+                    <th scope="col">Status</th>
+                    <th scope="col">Action</th>
+                </tr>
+                </thead>
+                <tbody>
+                <th:block th:if="${jobDtoList.getTotalElements()==0}">
+                    <p class="alert alert-warning text-center h4">No offer has been found !</p>
+                </th:block>
+                <th:block th:each="job,index : ${jobDtoList}">
+                    <tr class="">
+                        <td th:text="${index.index + pageSize * (pageNumber - 1) + 1}"></td>
+                        <td th:text="${job.jobTitle}"></td>
+                        <td>
+                            <span th:each="skill, status : ${job.skills}">
+                                <span th:text="${skill.skillsDesc}"></span>
+                                <span th:if="${not status.last}">, </span>
+                            </span>
+                        </td>
+                        <td th:text="${job.jobStart.toString()}"></td>
+                        <td th:text="${job.jobEnd.toString()}"></td>
+                        <td th:text="${job.jobStatus}"></td>
+                        <td>
+                            <a class="text-black" th:href="@{'/jobs/' + ${job.getJobId()}}"><i
+                                    class="far fa-eye"></i></a>
+                            <a sec:authorize="hasAnyRole('ROLE_RECRUITER','ROLE_MANAGER','ROLE_ADMIN')"
+                               class="text-black"
+                               th:href="@{'/jobs/update/' + ${job.getJobId()}}"><i
+                                    class="fas fa-edit"></i></a>
+                            <a sec:authorize="hasAnyRole('ROLE_RECRUITER','ROLE_MANAGER','ROLE_ADMIN')"
+                               class="text-black px-1"
+                               th:href="@{'/jobs/delete/' + ${job.getJobId()}}"><i
+                                    class="fas fa-trash-alt"></i></a>
+                        </td>
+                    </tr>
+                </th:block>
+                </tbody>
+            </table>
+
+            <!--            Phần phân trang-->
+            <nav aria-label="Page navigation">
+                <ul class="pagination justify-content-between">
+                    <div></div>
+                    <div class="d-flex">
+
+                        <th:block th:unless="${jobDtoList.getTotalElements()==0}">
+                            <th:block th:if="${pageNumber < totalPages}">
+                                <p class="p-2"
+                                   th:text="(((${pageNumber}-1)* ${pageSize}+1) + ' - ' + ${pageNumber} * ${pageSize} + ' / ' +  ${totalElements} + ' rows')"></p>
+                            </th:block>
+
+                            <th:block th:if="${pageNumber >= totalPages}">
+                                <p class="p-2"
+                                   th:text="(((${pageNumber}-1)* ${pageSize}+1) + ' - ' + ${totalElements} + ' / ' +  ${totalElements} + ' rows')"></p>
+                            </th:block>
+                        </th:block>
+
+
+                        <th:block th:if="${pageNumber > 1}">
+                            <li class="page-item">
+                                <a class="page-link"
+                                   th:href="@{/jobs(pageNumber=${pageNumber}-1,valueSearch=${valueSearch},status=${status})}"><
+                                    Prev</a>
+                            </li>
+                        </th:block>
+                        <th:block th:if="${pageNumber <= 1}">
+                            <li class="page-item disabled">
+                                <a class="page-link" tabindex="-1" aria-disabled="true">< Prev</a>
+                            </li>
+                        </th:block>
+                        <th:block th:if="${pageNumber < totalPages}">
+                            <li class="page-item">
+                                <a class="page-link"
+                                   th:href="@{/jobs(pageNumber=${pageNumber}+1,valueSearch=${valueSearch},status=${status})}">Next
+                                    ></a>
+                            </li>
+                        </th:block>
+                        <th:block th:if="${pageNumber >= totalPages}">
+                            <li class="page-item disabled">
+                                <a class="page-link" tabindex="-1" aria-disabled="true">Next ></a>
+                            </li>
+                        </th:block>
+                        </th:block>
+                    </div>
+                </ul>
+            </nav>
+        </div>
+    </div>
+</main>
+<!-- partial -->
+</body>
+</html>
